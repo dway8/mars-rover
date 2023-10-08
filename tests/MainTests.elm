@@ -69,3 +69,39 @@ parseInputTests =
                 in
                 Expect.equal expected (Main.parseInput input)
         ]
+
+
+transformTests : Test
+transformTests =
+    describe "transform"
+        [ test "returns \"ERROR\" if the input is wrong" <|
+            \_ ->
+                let
+                    input =
+                        "WRONG"
+
+                    expected =
+                        "ERROR"
+                in
+                Expect.equal expected (Main.transform input)
+        , test "returns the robots new positions if the input is correct #1" <|
+            \_ ->
+                let
+                    input =
+                        "4 8\n(2, 3, E) LFRFF\n(0, 2, N) FFLFRFF"
+
+                    expected =
+                        "(4, 4, E)\n(0, 4, W) LOST"
+                in
+                Expect.equal expected (Main.transform input)
+        , test "returns the robots new positions if the input is correct #2" <|
+            \_ ->
+                let
+                    input =
+                        "4 8\n(2, 3, N) FLLFR\n(1, 0, S) FFRLF"
+
+                    expected =
+                        "(2, 3, W)\n(1, 0, S) LOST"
+                in
+                Expect.equal expected (Main.transform input)
+        ]

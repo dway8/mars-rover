@@ -1,9 +1,12 @@
 port module Main exposing
     ( main
     , parseInput
+    , transform
     )
 
+import Grid
 import Platform exposing (Program)
+import Robot
 
 
 port transformInput : (String -> msg) -> Sub msg
@@ -52,8 +55,24 @@ subscriptions _ =
 
 transform : String -> String
 transform input =
-    -- TODO
-    input ++ "-OK"
+    parseInput input
+        |> Maybe.andThen
+            (\{ gridInput, robotsInput } ->
+                case ( Grid.fromString gridInput, Robot.listFromString robotsInput ) of
+                    ( Just grid, Just robots ) ->
+                        Just ( grid, robots )
+
+                    _ ->
+                        Nothing
+            )
+        |> Maybe.map
+            (\( grid, robots ) ->
+                robots
+                    |> List.map (Robot.move grid)
+                    |> List.map Robot.toString
+                    |> String.join "\n"
+            )
+        |> Maybe.withDefault "ERROR"
 
 
 parseInput : String -> Maybe { gridInput : String, robotsInput : List String }

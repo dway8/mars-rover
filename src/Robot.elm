@@ -2,11 +2,14 @@ module Robot exposing
     ( Robot(..)
     , fromString
     , initialStateFromString
+    , listFromString
     , move
+    , toString
     )
 
 import Grid exposing (Grid)
 import Instruction exposing (Instruction(..))
+import Maybe.Extra
 import Orientation exposing (Orientation(..))
 import Position exposing (Position)
 
@@ -48,6 +51,13 @@ fromString str =
 
         _ ->
             Nothing
+
+
+listFromString : List String -> Maybe (List Robot)
+listFromString robotsInput =
+    robotsInput
+        |> List.map fromString
+        |> Maybe.Extra.combine
 
 
 initialStateFromString : String -> Maybe ( Position, Orientation )
@@ -134,3 +144,13 @@ moveForward orientation position =
 
         West ->
             { position | x = position.x - 1 }
+
+
+toString : Robot -> String
+toString robot =
+    case robot of
+        OnGrid { position, orientation } ->
+            "(" ++ Position.toString position ++ ", " ++ Orientation.toString orientation ++ ")"
+
+        OffGrid { lastKnownPosition, lastKnownOrientation } ->
+            "(" ++ Position.toString lastKnownPosition ++ ", " ++ Orientation.toString lastKnownOrientation ++ ") LOST"

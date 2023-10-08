@@ -3,6 +3,7 @@ module Orientation exposing
     , fromString
     , rotateLeft
     , rotateRight
+    , toString
     )
 
 import List.Extra
@@ -68,3 +69,19 @@ rotateBy { clockwise } orientation =
                     orientationsClockwise
             )
         |> Maybe.withDefault orientation
+
+
+toString : Orientation -> String
+toString orientation =
+    case orientation of
+        North ->
+            "N"
+
+        East ->
+            "E"
+
+        South ->
+            "S"
+
+        West ->
+            "W"
