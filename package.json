@@ -1,0 +1,16 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mars-rover.js",
+  "scripts": {
+    "build": "elm make src/Main.elm --output main.js --optimize"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "^0.19.1-5",
+    "elm-format": "^0.8.7"
+  }
+}
