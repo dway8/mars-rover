@@ -2,7 +2,7 @@
   "name": "src",
   "version": "1.0.0",
   "description": "",
-  "main": "mars-rover.js",
+  "main": "move-robots.js",
   "scripts": {
     "build": "elm make src/Main.elm --output main.js --optimize",
     "test": "elm-test"
