@@ -5,11 +5,13 @@ port module Main exposing
     )
 
 import Grid
+import Json.Decode as D
+import Json.Encode as E
 import Platform exposing (Program)
 import Robot
 
 
-port transformInput : (String -> msg) -> Sub msg
+port transformInput : (E.Value -> msg) -> Sub msg
 
 
 port sendResult : String -> Cmd msg
@@ -29,7 +31,7 @@ type alias Model =
 
 
 type Msg
-    = Input String
+    = Input E.Value
 
 
 type alias Flags =
@@ -53,26 +55,36 @@ subscriptions _ =
     transformInput Input
 
 
-transform : String -> String
-transform input =
-    parseInput input
-        |> Maybe.andThen
-            (\{ gridInput, robotsInput } ->
-                case ( Grid.fromString gridInput, Robot.listFromString robotsInput ) of
-                    ( Just grid, Just robots ) ->
-                        Just ( grid, robots )
+transform : E.Value -> String
+transform jsonInput =
+    case D.decodeValue D.string jsonInput of
+        Ok inputStr ->
+            parseInput inputStr
+                |> Maybe.andThen
+                    (\{ gridInput, robotsInput } ->
+                        case ( Grid.fromString gridInput, Robot.listFromString robotsInput ) of
+                            ( Just grid, Just robots ) ->
+                                Just ( grid, robots )
 
-                    _ ->
-                        Nothing
-            )
-        |> Maybe.map
-            (\( grid, robots ) ->
-                robots
-                    |> List.map (Robot.move grid)
-                    |> List.map Robot.toString
-                    |> String.join "\n"
-            )
-        |> Maybe.withDefault "ERROR"
+                            _ ->
+                                Nothing
+                    )
+                |> Maybe.map
+                    (\( grid, robots ) ->
+                        robots
+                            |> List.map (Robot.move grid)
+                            |> List.map Robot.toString
+                            |> String.join "\n"
+                    )
+                |> Maybe.withDefault errorResult
+
+        Err _ ->
+            errorResult
+
+
+errorResult : String
+errorResult =
+    "ERROR"
 
 
 parseInput : String -> Maybe { gridInput : String, robotsInput : List String }
