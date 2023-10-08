@@ -9,15 +9,6 @@ import Robot exposing (Robot(..))
 import Test exposing (Test, describe, test)
 
 
-suite : Test
-suite =
-    describe "Robot module"
-        [ initialStateFromStringTests
-        , fromStringTests
-        , moveTests
-        ]
-
-
 initialStateFromStringTests : Test
 initialStateFromStringTests =
     describe "initialStateFromStringTests"
