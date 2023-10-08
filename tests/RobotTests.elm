@@ -123,4 +123,72 @@ suite =
                     in
                     Expect.equal expected (Robot.fromString input)
             ]
+        , describe "move"
+            ((test "returns the same robot if no instructions" <|
+                \_ ->
+                    let
+                        input =
+                            { position = Position 3 6
+                            , orientation = South
+                            , remainingInstructions = []
+                            }
+
+                        expected =
+                            input
+                    in
+                    Expect.equal expected (Robot.move input)
+             )
+                :: ([ { input =
+                            { position = Position 3 6
+                            , orientation = South
+                            , remainingInstructions = [ Forward ]
+                            }
+                      , expected =
+                            { position = Position 3 5
+                            , orientation = South
+                            , remainingInstructions = []
+                            }
+                      }
+                    , { input =
+                            { position = Position 0 0
+                            , orientation = West
+                            , remainingInstructions = [ Right, Forward, Forward, Right, Forward ]
+                            }
+                      , expected =
+                            { position = Position 1 2
+                            , orientation = East
+                            , remainingInstructions = []
+                            }
+                      }
+                    , { input =
+                            { position = Position 4 3
+                            , orientation = West
+                            , remainingInstructions = [ Right, Left, Right, Left ]
+                            }
+                      , expected =
+                            { position = Position 4 3
+                            , orientation = West
+                            , remainingInstructions = []
+                            }
+                      }
+                    , { input =
+                            { position = Position 2 6
+                            , orientation = North
+                            , remainingInstructions = [ Forward, Forward, Forward ]
+                            }
+                      , expected =
+                            { position = Position 2 9
+                            , orientation = North
+                            , remainingInstructions = []
+                            }
+                      }
+                    ]
+                        |> List.indexedMap
+                            (\idx { input, expected } ->
+                                test ("returns a robot with correct position & orientation for various scenarios: #" ++ String.fromInt idx) <|
+                                    \_ ->
+                                        Expect.equal expected (Robot.move input)
+                            )
+                   )
+            )
         ]

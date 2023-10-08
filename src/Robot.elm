@@ -2,10 +2,11 @@ module Robot exposing
     ( Robot
     , fromString
     , initialStateFromString
+    , move
     )
 
-import Instruction exposing (Instruction)
-import Orientation exposing (Orientation)
+import Instruction exposing (Instruction(..))
+import Orientation exposing (Orientation(..))
 import Position exposing (Position)
 
 
@@ -65,3 +66,51 @@ initialStateFromString str =
                     _ ->
                         Nothing
            )
+
+
+move : Robot -> Robot
+move robot =
+    case robot.remainingInstructions of
+        [] ->
+            -- robot has finished moving
+            robot
+
+        nextMovement :: rest ->
+            let
+                ( nextPosition, nextOrientation ) =
+                    executeInstruction nextMovement ( robot.position, robot.orientation )
+            in
+            { position = nextPosition
+            , orientation = nextOrientation
+            , remainingInstructions = rest
+            }
+                |> move
+
+
+executeInstruction : Instruction -> ( Position, Orientation ) -> ( Position, Orientation )
+executeInstruction movement ( position, orientation ) =
+    case movement of
+        Forward ->
+            ( moveForward orientation position, orientation )
+
+        Left ->
+            ( position, Orientation.rotateLeft orientation )
+
+        Right ->
+            ( position, Orientation.rotateRight orientation )
+
+
+moveForward : Orientation -> Position -> Position
+moveForward orientation position =
+    case orientation of
+        North ->
+            { position | y = position.y + 1 }
+
+        East ->
+            { position | x = position.x + 1 }
+
+        South ->
+            { position | y = position.y - 1 }
+
+        West ->
+            { position | x = position.x - 1 }
