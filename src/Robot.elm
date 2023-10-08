@@ -150,7 +150,12 @@ toString : Robot -> String
 toString robot =
     case robot of
         OnGrid { position, orientation } ->
-            "(" ++ Position.toString position ++ ", " ++ Orientation.toString orientation ++ ")"
+            stateToString position orientation
 
         OffGrid { lastKnownPosition, lastKnownOrientation } ->
-            "(" ++ Position.toString lastKnownPosition ++ ", " ++ Orientation.toString lastKnownOrientation ++ ") LOST"
+            stateToString lastKnownPosition lastKnownOrientation ++ " LOST"
+
+
+stateToString : Position -> Orientation -> String
+stateToString position orientation =
+    "(" ++ Position.toString position ++ ", " ++ Orientation.toString orientation ++ ")"
