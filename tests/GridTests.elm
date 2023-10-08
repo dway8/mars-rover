@@ -78,8 +78,6 @@ fromStringTests =
                         Just { columns = 8, rows = 3 }
                 in
                 Expect.equal expected (Grid.fromString input)
-
-        -- TODO: grid with rows/columns 0?
         ]
 
 

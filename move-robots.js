@@ -12,10 +12,10 @@ if (args.length !== 1) {
     return;
 }
 
-const filePath = args[0];
-fs.readFile(filePath, (err, data) => {
+const filepath = args[0];
+fs.readFile(filepath, (err, data) => {
     if (err) {
-        console.error(`[Error] Error while reading file ${filePath}: `+ err.message);
+        console.error(`[Error] Error while reading file '${filepath}': `+ err.message);
         return;
     }
     const input = data.toString();
