@@ -1,20 +1,26 @@
 module Robot exposing
-    ( Robot
+    ( Robot(..)
     , fromString
     , initialStateFromString
     , move
     )
 
+import Grid exposing (Grid)
 import Instruction exposing (Instruction(..))
 import Orientation exposing (Orientation(..))
 import Position exposing (Position)
 
 
-type alias Robot =
-    { position : Position
-    , orientation : Orientation
-    , remainingInstructions : List Instruction
-    }
+type Robot
+    = OnGrid
+        { position : Position
+        , orientation : Orientation
+        , remainingInstructions : List Instruction
+        }
+    | OffGrid
+        { lastKnownPosition : Position
+        , lastKnownOrientation : Orientation
+        }
 
 
 fromString : String -> Maybe Robot
@@ -27,10 +33,11 @@ fromString str =
             else
                 Maybe.map2
                     (\( position, orientation ) instructions ->
-                        { position = position
-                        , orientation = orientation
-                        , remainingInstructions = instructions
-                        }
+                        OnGrid
+                            { position = position
+                            , orientation = orientation
+                            , remainingInstructions = instructions
+                            }
                     )
                     (positionAndOrientationStr
                         -- drop first parenthesis
@@ -68,23 +75,36 @@ initialStateFromString str =
            )
 
 
-move : Robot -> Robot
-move robot =
-    case robot.remainingInstructions of
-        [] ->
-            -- robot has finished moving
+move : Grid -> Robot -> Robot
+move grid robot =
+    case robot of
+        OffGrid _ ->
             robot
 
-        nextMovement :: rest ->
-            let
-                ( nextPosition, nextOrientation ) =
-                    executeInstruction nextMovement ( robot.position, robot.orientation )
-            in
-            { position = nextPosition
-            , orientation = nextOrientation
-            , remainingInstructions = rest
-            }
-                |> move
+        OnGrid onGridRobotData ->
+            case onGridRobotData.remainingInstructions of
+                [] ->
+                    -- robot has finished moving
+                    robot
+
+                nextMovement :: rest ->
+                    let
+                        ( nextPosition, nextOrientation ) =
+                            executeInstruction nextMovement ( onGridRobotData.position, onGridRobotData.orientation )
+                    in
+                    if Grid.isPositionInside grid nextPosition then
+                        OnGrid
+                            { position = nextPosition
+                            , orientation = nextOrientation
+                            , remainingInstructions = rest
+                            }
+                            |> move grid
+
+                    else
+                        OffGrid
+                            { lastKnownPosition = onGridRobotData.position
+                            , lastKnownOrientation = onGridRobotData.orientation
+                            }
 
 
 executeInstruction : Instruction -> ( Position, Orientation ) -> ( Position, Orientation )
