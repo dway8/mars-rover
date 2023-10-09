@@ -5,8 +5,8 @@ The Mars Rover app takes in a grid size & some robots input, and moves the robot
 \
 It works as follows:
 - the JS script `move-robots.js` takes a filepath as an argument
-- it reads the file content and sends it to an Elm worker _(headless Elm program)_ via an [ingoing port](https://guide.elm-lang.org/interop/ports.html)
-- the Elm worker parses the input, moves the robots & sends back the final states of the robots via an outgoing port
+- it reads the file content and initializes the Elm worker _(headless Elm program)_ with the input in the [flags](https://guide.elm-lang.org/interop/flags)
+- the Elm worker parses the input, moves the robots & sends back the final states of the robots via an [outgoing port](https://guide.elm-lang.org/interop/ports.html)
 - the JS script receives the result and prints it to the console.
 
 ## ⚙️ Installation

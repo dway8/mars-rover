@@ -11,18 +11,15 @@ import Platform exposing (Program)
 import Robot
 
 
-port transformInput : (E.Value -> msg) -> Sub msg
-
-
 port sendResult : String -> Cmd msg
 
 
-main : Program Flags Model Msg
+main : Program Flags Model msg
 main =
     Platform.worker
         { init = init
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         }
 
 
@@ -30,29 +27,18 @@ type alias Model =
     ()
 
 
-type Msg
-    = Input E.Value
-
-
 type alias Flags =
-    ()
+    { input : E.Value }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init _ =
-    ( (), Cmd.none )
+init : Flags -> ( Model, Cmd msg )
+init flags =
+    ( (), transform flags.input |> sendResult )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        Input input ->
-            ( model, transform input |> sendResult )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    transformInput Input
+update : msg -> Model -> ( Model, Cmd msg )
+update _ model =
+    ( model, Cmd.none )
 
 
 transform : E.Value -> String

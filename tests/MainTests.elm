@@ -1,6 +1,7 @@
 module MainTests exposing (..)
 
 import Expect
+import Json.Encode as E
 import Main
 import Test exposing (Test, describe, test)
 
@@ -78,7 +79,7 @@ transformTests =
             \_ ->
                 let
                     input =
-                        "WRONG"
+                        E.string "WRONG"
 
                     expected =
                         "ERROR"
@@ -88,7 +89,7 @@ transformTests =
             \_ ->
                 let
                     input =
-                        "4 8\n(2, 3, E) LFRFF\n(0, 2, N) FFLFRFF"
+                        E.string "4 8\n(2, 3, E) LFRFF\n(0, 2, N) FFLFRFF"
 
                     expected =
                         "(4, 4, E)\n(0, 4, W) LOST"
@@ -98,7 +99,7 @@ transformTests =
             \_ ->
                 let
                     input =
-                        "4 8\n(2, 3, N) FLLFR\n(1, 0, S) FFRLF"
+                        E.string "4 8\n(2, 3, N) FLLFR\n(1, 0, S) FFRLF"
 
                     expected =
                         "(2, 3, W)\n(1, 0, S) LOST"
