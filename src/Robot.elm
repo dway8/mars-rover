@@ -124,10 +124,10 @@ executeInstruction movement ( position, orientation ) =
             ( moveForward orientation position, orientation )
 
         Left ->
-            ( position, Orientation.rotateLeft orientation )
+            ( position, Orientation.rotateAntiClockwise orientation )
 
         Right ->
-            ( position, Orientation.rotateRight orientation )
+            ( position, Orientation.rotateClockwise orientation )
 
 
 moveForward : Orientation -> Position -> Position

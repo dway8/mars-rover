@@ -1,8 +1,8 @@
 module Orientation exposing
     ( Orientation(..)
     , fromString
-    , rotateLeft
-    , rotateRight
+    , rotateAntiClockwise
+    , rotateClockwise
     , toString
     )
 
@@ -35,40 +35,36 @@ fromString str =
             Nothing
 
 
-orientationsClockwise : List Orientation
-orientationsClockwise =
-    [ North, East, South, West ]
+rotateClockwise : Orientation -> Orientation
+rotateClockwise orientation =
+    case orientation of
+        North ->
+            East
+
+        East ->
+            South
+
+        South ->
+            West
+
+        West ->
+            North
 
 
-rotateLeft : Orientation -> Orientation
-rotateLeft =
-    rotateBy { clockwise = False }
+rotateAntiClockwise : Orientation -> Orientation
+rotateAntiClockwise orientation =
+    case orientation of
+        North ->
+            West
 
+        East ->
+            North
 
-rotateRight : Orientation -> Orientation
-rotateRight =
-    rotateBy { clockwise = True }
+        South ->
+            East
 
-
-rotateBy : { clockwise : Bool } -> Orientation -> Orientation
-rotateBy { clockwise } orientation =
-    List.Extra.elemIndex orientation orientationsClockwise
-        |> Maybe.andThen
-            (\idx ->
-                List.Extra.getAt
-                    (modBy 4
-                        (idx
-                            + (if clockwise then
-                                1
-
-                               else
-                                -1
-                              )
-                        )
-                    )
-                    orientationsClockwise
-            )
-        |> Maybe.withDefault orientation
+        West ->
+            South
 
 
 toString : Orientation -> String
