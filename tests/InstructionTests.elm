@@ -27,7 +27,7 @@ suite =
                             "FFDL"
                     in
                     Expect.err (P.run Instruction.sequenceParser input)
-            , test "returns the right sequence of movements in the right order" <|
+            , test "returns the right sequence of instructions in the right order" <|
                 \_ ->
                     let
                         input =

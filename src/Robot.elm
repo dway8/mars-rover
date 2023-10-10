@@ -75,10 +75,10 @@ move grid robot =
                     -- robot has finished moving
                     robot
 
-                nextMovement :: rest ->
+                nextInstruction :: rest ->
                     let
                         ( nextPosition, nextOrientation ) =
-                            executeInstruction nextMovement ( onGridRobotData.position, onGridRobotData.orientation )
+                            executeInstruction nextInstruction ( onGridRobotData.position, onGridRobotData.orientation )
                     in
                     if Grid.isPositionInside grid nextPosition then
                         OnGrid
@@ -96,8 +96,8 @@ move grid robot =
 
 
 executeInstruction : Instruction -> ( Position, Orientation ) -> ( Position, Orientation )
-executeInstruction movement ( position, orientation ) =
-    case movement of
+executeInstruction instruction ( position, orientation ) =
+    case instruction of
         Forward ->
             ( moveForward orientation position, orientation )
 
