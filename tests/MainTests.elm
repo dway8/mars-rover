@@ -1,8 +1,13 @@
 module MainTests exposing (..)
 
 import Expect
+import Grid exposing (Grid)
+import Instruction exposing (Instruction(..))
 import Json.Encode as E
 import Main
+import Orientation exposing (Orientation(..))
+import Position exposing (Position)
+import Robot exposing (Robot(..))
 import Test exposing (Test, describe, test)
 
 
@@ -29,7 +34,7 @@ parseInputTests =
                         Nothing
                 in
                 Expect.equal expected (Main.parseInput input)
-        , test "returns Nothing if the input only contains a robot" <|
+        , test "returns Nothing if the input only contains a robot and no grid" <|
             \_ ->
                 let
                     input =
@@ -43,30 +48,67 @@ parseInputTests =
             \_ ->
                 let
                     input =
-                        "4 5\n(6, 6, N) LFFFRFFFF"
+                        "4 5\n(6, 6, N) FL"
 
                     expected =
-                        Just { gridInput = "4 5", robotsInput = [ "(6, 6, N) LFFFRFFFF" ] }
+                        Just
+                            { grid = Grid 4 5
+                            , robots =
+                                [ OnGrid
+                                    { position = Position 6 6
+                                    , orientation = North
+                                    , remainingInstructions = [ Forward, Left ]
+                                    }
+                                ]
+                            }
                 in
                 Expect.equal expected (Main.parseInput input)
         , test "returns grid & robots input correctly if there is a grid & 2 robots" <|
             \_ ->
                 let
                     input =
-                        "400 300\n(16, 6, N) LFFFRFFFF\n(0, 2, S) L"
+                        "400 300\n(16, 6, N) FFFF\n(0, 2, S) L"
 
                     expected =
-                        Just { gridInput = "400 300", robotsInput = [ "(16, 6, N) LFFFRFFFF", "(0, 2, S) L" ] }
+                        Just
+                            { grid = Grid 400 300
+                            , robots =
+                                [ OnGrid
+                                    { position = Position 16 6
+                                    , orientation = North
+                                    , remainingInstructions = [ Forward, Forward, Forward, Forward ]
+                                    }
+                                , OnGrid
+                                    { position = Position 0 2
+                                    , orientation = South
+                                    , remainingInstructions = [ Left ]
+                                    }
+                                ]
+                            }
                 in
                 Expect.equal expected (Main.parseInput input)
         , test "does not fail if there is a new line at the end of the last robot" <|
             \_ ->
                 let
                     input =
-                        "400 300\n(16, 6, N) LFFFRFFFF\n(0, 2, S) L\n"
+                        "400 300\n(16, 6, N) FFF\n(0, 2, S) L\n"
 
                     expected =
-                        Just { gridInput = "400 300", robotsInput = [ "(16, 6, N) LFFFRFFFF", "(0, 2, S) L" ] }
+                        Just
+                            { grid = Grid 400 300
+                            , robots =
+                                [ OnGrid
+                                    { position = Position 16 6
+                                    , orientation = North
+                                    , remainingInstructions = [ Forward, Forward, Forward ]
+                                    }
+                                , OnGrid
+                                    { position = Position 0 2
+                                    , orientation = South
+                                    , remainingInstructions = [ Left ]
+                                    }
+                                ]
+                            }
                 in
                 Expect.equal expected (Main.parseInput input)
         ]

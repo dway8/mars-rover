@@ -1,9 +1,10 @@
 module Grid exposing
     ( Grid
-    , fromString
     , isPositionInside
+    , parser
     )
 
+import Parser as P exposing ((|.), (|=))
 import Position exposing (Position)
 
 
@@ -13,23 +14,13 @@ type alias Grid =
     }
 
 
-fromString : String -> Maybe Grid
-fromString str =
-    str
-        |> String.split " "
-        |> (\list ->
-                case list of
-                    columnsStr :: rowsStr :: [] ->
-                        case ( String.toInt columnsStr, String.toInt rowsStr ) of
-                            ( Just columns, Just rows ) ->
-                                Just { columns = columns, rows = rows }
-
-                            _ ->
-                                Nothing
-
-                    _ ->
-                        Nothing
-           )
+parser : P.Parser Grid
+parser =
+    P.succeed Grid
+        |= P.int
+        |. P.symbol " "
+        |= P.int
+        |. P.symbol "\n"
 
 
 isPositionInside : Grid -> Position -> Bool

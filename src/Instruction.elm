@@ -1,9 +1,10 @@
 module Instruction exposing
     ( Instruction(..)
-    , sequenceFromString
+    , sequenceParser
     )
 
 import Maybe.Extra
+import Parser as P exposing ((|.))
 
 
 type Instruction
@@ -28,10 +29,23 @@ fromChar str =
             Nothing
 
 
-sequenceFromString : String -> Maybe (List Instruction)
-sequenceFromString str =
-    str
-        |> String.trim
-        |> String.toList
-        |> List.map fromChar
-        |> Maybe.Extra.combine
+sequenceParser : P.Parser (List Instruction)
+sequenceParser =
+    P.succeed ()
+        |. P.chompUntilEndOr "\n"
+        |> P.getChompedString
+        |> P.andThen
+            (\str ->
+                str
+                    |> String.toList
+                    |> List.map fromChar
+                    |> Maybe.Extra.combine
+                    |> (\res ->
+                            case res of
+                                Just instructions ->
+                                    P.succeed instructions
+
+                                Nothing ->
+                                    P.problem "Wrong instruction"
+                       )
+            )

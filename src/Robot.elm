@@ -1,16 +1,15 @@
 module Robot exposing
     ( Robot(..)
     , fromString
-    , initialStateFromString
-    , listFromString
     , move
+    , parser
     , toString
     )
 
 import Grid exposing (Grid)
 import Instruction exposing (Instruction(..))
-import Maybe.Extra
 import Orientation exposing (Orientation(..))
+import Parser as P exposing ((|.), (|=))
 import Position exposing (Position)
 
 
@@ -26,63 +25,42 @@ type Robot
         }
 
 
+parser : P.Parser Robot
+parser =
+    {- Some `P.spaces` are included to provide a bit of flexibility in the input.
+       Example: "(3,4,N)    FFFRF" is accepted.
+       If this is not desirable, we can remove the `P.spaces`
+        and just check for `P.symbol " "` at the right places.
+    -}
+    P.succeed
+        (\x y orientation instructions ->
+            OnGrid
+                { position = Position x y
+                , orientation = orientation
+                , remainingInstructions = instructions
+                }
+        )
+        |. P.symbol "("
+        |. P.spaces
+        |= P.int
+        |. P.spaces
+        |. P.symbol ","
+        |. P.spaces
+        |= P.int
+        |. P.symbol ","
+        |. P.spaces
+        |= Orientation.parser
+        |. P.spaces
+        |. P.symbol ")"
+        |. P.spaces
+        |= Instruction.sequenceParser
+        |. P.oneOf [ P.symbol "\n", P.end ]
+
+
 fromString : String -> Maybe Robot
 fromString str =
-    case String.split ")" str of
-        positionAndOrientationStr :: instructionsStr :: [] ->
-            if not (String.startsWith "(" str) then
-                Nothing
-
-            else
-                Maybe.map2
-                    (\( position, orientation ) instructions ->
-                        OnGrid
-                            { position = position
-                            , orientation = orientation
-                            , remainingInstructions = instructions
-                            }
-                    )
-                    (positionAndOrientationStr
-                        -- drop first parenthesis
-                        |> String.dropLeft 1
-                        |> initialStateFromString
-                    )
-                    (Instruction.sequenceFromString instructionsStr)
-
-        _ ->
-            Nothing
-
-
-listFromString : List String -> Maybe (List Robot)
-listFromString robotsInput =
-    robotsInput
-        |> List.map fromString
-        |> Maybe.Extra.combine
-
-
-initialStateFromString : String -> Maybe ( Position, Orientation )
-initialStateFromString str =
-    str
-        |> String.split ","
-        |> List.map String.trim
-        |> (\input ->
-                case input of
-                    xStr :: yStr :: orientationStr :: [] ->
-                        case
-                            ( String.toInt xStr
-                            , String.toInt yStr
-                            , Orientation.fromString orientationStr
-                            )
-                        of
-                            ( Just x, Just y, Just orientation ) ->
-                                Just ( Position x y, orientation )
-
-                            _ ->
-                                Nothing
-
-                    _ ->
-                        Nothing
-           )
+    P.run parser str
+        |> Result.toMaybe
 
 
 move : Grid -> Robot -> Robot

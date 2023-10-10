@@ -2,6 +2,7 @@ module GridTests exposing (..)
 
 import Expect
 import Grid exposing (Grid)
+import Parser as P
 import Test exposing (Test, describe, test)
 
 
@@ -13,71 +14,53 @@ fromStringTests =
                 let
                     input =
                         ""
-
-                    expected =
-                        Nothing
                 in
-                Expect.equal expected (Grid.fromString input)
+                Expect.err (P.run Grid.parser input)
         , test "returns Nothing if the input is wrong" <|
             \_ ->
                 let
                     input =
-                        "4 r"
-
-                    expected =
-                        Nothing
+                        "4 r\n"
                 in
-                Expect.equal expected (Grid.fromString input)
-        , test "returns Nothing if the input is padded with spaces" <|
-            \_ ->
-                let
-                    input =
-                        " 2 9  "
-
-                    expected =
-                        Nothing
-                in
-                Expect.equal expected (Grid.fromString input)
-        , test "returns Nothing if there is more than 1 space between columns and rows" <|
-            \_ ->
-                let
-                    input =
-                        "2  9"
-
-                    expected =
-                        Nothing
-                in
-                Expect.equal expected (Grid.fromString input)
+                Expect.err (P.run Grid.parser input)
         , test "returns Nothing if there is no space between columns and rows" <|
             \_ ->
                 let
                     input =
-                        "29"
-
-                    expected =
-                        Nothing
+                        "29\n"
                 in
-                Expect.equal expected (Grid.fromString input)
+                Expect.err (P.run Grid.parser input)
+        , test "returns Nothing if the input is padded with spaces" <|
+            \_ ->
+                let
+                    input =
+                        " 2 9  \n"
+                in
+                Expect.err (P.run Grid.parser input)
+        , test "returns Nothing if there is more than 1 space between columns and rows" <|
+            \_ ->
+                let
+                    input =
+                        "2  9\n"
+                in
+                Expect.err (P.run Grid.parser input)
         , test "returns Nothing if the input contains more than 2 numbers" <|
             \_ ->
                 let
                     input =
-                        "5 5 6"
-
-                    expected =
-                        Nothing
+                        "5 5 6\n"
                 in
-                Expect.equal expected (Grid.fromString input)
+                Expect.err (P.run Grid.parser input)
         , test "returns a correct grid for a correct input" <|
             \_ ->
                 let
                     input =
-                        "8 3"
+                        "8 3\n"
 
                     expected =
-                        Just { columns = 8, rows = 3 }
+                        Ok { columns = 8, rows = 3 }
                 in
-                Expect.equal expected (Grid.fromString input)
+                Expect.equal expected (P.run Grid.parser input)
         ]
 
 

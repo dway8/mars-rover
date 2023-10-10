@@ -1,12 +1,12 @@
 module Orientation exposing
     ( Orientation(..)
-    , fromString
+    , parser
     , rotateAntiClockwise
     , rotateClockwise
     , toString
     )
 
-import List.Extra
+import Parser as P exposing ((|.))
 
 
 type Orientation
@@ -16,23 +16,14 @@ type Orientation
     | West
 
 
-fromString : String -> Maybe Orientation
-fromString str =
-    case str of
-        "N" ->
-            Just North
-
-        "E" ->
-            Just East
-
-        "S" ->
-            Just South
-
-        "W" ->
-            Just West
-
-        _ ->
-            Nothing
+parser : P.Parser Orientation
+parser =
+    P.oneOf
+        [ P.succeed North |. P.symbol "N"
+        , P.succeed East |. P.symbol "E"
+        , P.succeed South |. P.symbol "S"
+        , P.succeed West |. P.symbol "W"
+        ]
 
 
 rotateClockwise : Orientation -> Orientation

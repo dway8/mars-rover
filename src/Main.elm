@@ -4,11 +4,12 @@ port module Main exposing
     , transform
     )
 
-import Grid
+import Grid exposing (Grid)
 import Json.Decode as D
 import Json.Encode as E
+import Parser as P exposing ((|.), (|=))
 import Platform exposing (Program)
-import Robot
+import Robot exposing (Robot)
 
 
 port sendResult : String -> Cmd msg
@@ -46,17 +47,8 @@ transform jsonInput =
     case D.decodeValue D.string jsonInput of
         Ok inputStr ->
             parseInput inputStr
-                |> Maybe.andThen
-                    (\{ gridInput, robotsInput } ->
-                        case ( Grid.fromString gridInput, Robot.listFromString robotsInput ) of
-                            ( Just grid, Just robots ) ->
-                                Just ( grid, robots )
-
-                            _ ->
-                                Nothing
-                    )
                 |> Maybe.map
-                    (\( grid, robots ) ->
+                    (\{ grid, robots } ->
                         robots
                             |> List.map (Robot.move grid)
                             |> List.map Robot.toString
@@ -73,21 +65,27 @@ errorResult =
     "ERROR"
 
 
-parseInput : String -> Maybe { gridInput : String, robotsInput : List String }
-parseInput input =
-    let
-        nonEmptyLines =
-            String.lines input
-                |> List.filter (String.isEmpty >> not)
-    in
-    case nonEmptyLines of
-        gridInput :: firstRobotInput :: restRobotInput ->
-            -- destructure in 2 terms + rest to ensure there is at least one robot input (`restRobotInput` can be empty)
-            Just
-                { gridInput = gridInput
-                , robotsInput = firstRobotInput :: restRobotInput
-                }
+type alias State =
+    { grid : Grid
+    , robots : List Robot
+    }
 
-        _ ->
-            -- there is not at least a grid input & one robot input => fail
-            Nothing
+
+parseInput : String -> Maybe State
+parseInput input =
+    P.run parser input
+        |> Result.toMaybe
+
+
+parser : P.Parser State
+parser =
+    P.succeed (\grid robots -> { grid = grid, robots = robots })
+        |= Grid.parser
+        |= P.sequence
+            { start = ""
+            , separator = ""
+            , end = ""
+            , spaces = P.succeed ()
+            , item = Robot.parser
+            , trailing = P.Forbidden
+            }

@@ -2,13 +2,14 @@ module InstructionTests exposing (..)
 
 import Expect
 import Instruction exposing (Instruction(..))
+import Parser as P
 import Test exposing (Test, describe, test)
 
 
 suite : Test
 suite =
     describe "Instruction module"
-        [ describe "sequenceFromString"
+        [ describe "sequenceParser"
             [ test "returns an empty list if the input is empty" <|
                 \_ ->
                     let
@@ -16,19 +17,16 @@ suite =
                             ""
 
                         expected =
-                            Just []
+                            Ok []
                     in
-                    Expect.equal expected (Instruction.sequenceFromString input)
+                    Expect.equal expected (P.run Instruction.sequenceParser input)
             , test "returns Nothing if the input is wrong" <|
                 \_ ->
                     let
                         input =
-                            "/FDFD"
-
-                        expected =
-                            Nothing
+                            "FFDL"
                     in
-                    Expect.equal expected (Instruction.sequenceFromString input)
+                    Expect.err (P.run Instruction.sequenceParser input)
             , test "returns the right sequence of movements in the right order" <|
                 \_ ->
                     let
@@ -36,8 +34,8 @@ suite =
                             "FFLFRFF"
 
                         expected =
-                            Just [ Forward, Forward, Left, Forward, Right, Forward, Forward ]
+                            Ok [ Forward, Forward, Left, Forward, Right, Forward, Forward ]
                     in
-                    Expect.equal expected (Instruction.sequenceFromString input)
+                    Expect.equal expected (P.run Instruction.sequenceParser input)
             ]
         ]
