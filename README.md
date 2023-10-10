@@ -1,8 +1,14 @@
 # Mars Rover
 
 ## 📝 Overview
-The Mars Rover app takes in a grid size & some robots input, and moves the robots around Mars 🤖🛸\
-\
+The Mars Rover app takes in a grid size & some robots input, and moves the robots around Mars 🤖🛸
+```mermaid
+flowchart TB
+    A[ move-robots.js]
+    A-->|send input.txt content|B[Elm worker compiled to JS]
+    B-->|parse input|C(Compute robots new positions)
+    C-.->|send back new positions|A
+```
 It works as follows:
 - the JS script `move-robots.js` takes a filepath as an argument
 - it reads the file content and initializes the Elm worker _(headless Elm program)_ with the input in the [flags](https://guide.elm-lang.org/interop/flags)
