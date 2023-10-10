@@ -61,6 +61,16 @@ fromStringTests =
                         Ok { columns = 8, rows = 3 }
                 in
                 Expect.equal expected (P.run Grid.parser input)
+        , test "returns a correct grid for # of rows/columns > 10" <|
+            \_ ->
+                let
+                    input =
+                        "100 20\n"
+
+                    expected =
+                        Ok { columns = 100, rows = 20 }
+                in
+                Expect.equal expected (P.run Grid.parser input)
         ]
 
 
